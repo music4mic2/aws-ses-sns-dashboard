@@ -1,6 +1,6 @@
 package main
 
-type mail struct {
+type Mail struct {
   timestamp string
   sendingAccountId string
   source string
@@ -9,7 +9,7 @@ type mail struct {
   destination []string
 }
 
-type message struct {
+type Message struct {
   notificationType string
-  mail mail
+  mail Mail
 }
