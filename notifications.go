@@ -16,6 +16,7 @@ func (l *StringArray) Scan(input interface{}) error {
 }
 
 type Mail struct {
+	ID               uint        `gjson:"-" gorm:"primary_key"`
 	Destination      StringArray `json:"destination" sql:"type:text"`
 	MessageID        string      `json:"messageId"`
 	SendingAccountID string      `json:"sendingAccountId"`
@@ -32,6 +33,7 @@ type DeliveryType struct {
 		SMTPResponse         string      `json:"smtpResponse"`
 		Timestamp            string      `json:"timestamp"`
 	} `json:"delivery"`
+	ID               uint   `gjson:"-" gorm:"primary_key"`
 	Mail             Mail   `json:"mail"`
 	NotificationType string `json:"notificationType"`
 }
@@ -50,6 +52,7 @@ type BounceType struct {
 		ReportingMTA string `json:"reportingMTA"`
 		Timestamp    string `json:"timestamp"`
 	} `json:"bounce"`
+	ID               uint   `gjson:"-" gorm:"primary_key"`
 	Mail             Mail   `json:"mail"`
 	NotificationType string `json:"notificationType"`
 }
