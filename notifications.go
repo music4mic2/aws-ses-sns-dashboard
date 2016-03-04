@@ -25,34 +25,40 @@ type Mail struct {
 	Timestamp        string      `json:"timestamp"`
 }
 
-type DeliveryType struct {
-	Delivery struct {
-		ProcessingTimeMillis int         `json:"processingTimeMillis"`
-		Recipients           StringArray `json:"recipients" sql:"type:text"`
-		ReportingMTA         string      `json:"reportingMTA"`
-		SMTPResponse         string      `json:"smtpResponse"`
-		Timestamp            string      `json:"timestamp"`
-	} `json:"delivery"`
-	ID               uint   `gjson:"-" gorm:"primary_key"`
-	Mail             Mail   `json:"mail"`
-	NotificationType string `json:"notificationType"`
+type Delivery struct {
+	ProcessingTimeMillis int         `json:"processingTimeMillis"`
+	Recipients           StringArray `json:"recipients" sql:"type:text"`
+	ReportingMTA         string      `json:"reportingMTA"`
+	SMTPResponse         string      `json:"smtpResponse"`
+	Timestamp            string      `json:"timestamp"`
 }
 
+type Bounce struct {
+	BounceSubType     string `json:"bounceSubType"`
+	BounceType        string `json:"bounceType"`
+	BouncedRecipients []struct {
+		Action         string `json:"action"`
+		DiagnosticCode string `json:"diagnosticCode"`
+		EmailAddress   string `json:"emailAddress"`
+		Status         string `json:"status"`
+	} `json:"bouncedRecipients"`
+	FeedbackID   string `json:"feedbackId"`
+	ReportingMTA string `json:"reportingMTA"`
+	Timestamp    string `json:"timestamp"`
+}
+
+//TODO polimorfic association
+
 type BounceType struct {
-	Bounce struct {
-		BounceSubType     string `json:"bounceSubType"`
-		BounceType        string `json:"bounceType"`
-		BouncedRecipients []struct {
-			Action         string `json:"action"`
-			DiagnosticCode string `json:"diagnosticCode"`
-			EmailAddress   string `json:"emailAddress"`
-			Status         string `json:"status"`
-		} `json:"bouncedRecipients"`
-		FeedbackID   string `json:"feedbackId"`
-		ReportingMTA string `json:"reportingMTA"`
-		Timestamp    string `json:"timestamp"`
-	} `json:"bounce"`
 	ID               uint   `gjson:"-" gorm:"primary_key"`
-	Mail             Mail   `json:"mail"`
 	NotificationType string `json:"notificationType"`
+	Mail             Mail   `json:"mail"`
+	Bounce           Bounce `json:"bounce"`
+}
+
+type DeliveryType struct {
+	ID               uint     `gjson:"-" gorm:"primary_key"`
+	NotificationType string   `json:"notificationType"`
+	Mail             Mail     `json:"mail"`
+	Delivery         Delivery `json:"delivery"`
 }
