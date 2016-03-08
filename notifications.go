@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
+	"time"
 )
 
 type StringArray []string
@@ -17,7 +18,7 @@ func (l *StringArray) Scan(input interface{}) error {
 }
 
 type Mail struct {
-	ID               uint        `json:"-" gorm:"primary_key"`
+	ID               uint        `json:"-"`
 	Destination      StringArray `json:"destination" sql:"type:text"`
 	MessageID        string      `json:"messageId"`
 	SendingAccountID string      `json:"sendingAccountId"`
@@ -27,7 +28,7 @@ type Mail struct {
 }
 
 type Delivery struct {
-	ID                   uint        `json:"-" gorm:"primary_key"`
+	ID                   uint        `json:"-"`
 	ProcessingTimeMillis int         `json:"processingTimeMillis"`
 	Recipients           StringArray `json:"recipients" sql:"type:text"`
 	ReportingMTA         string      `json:"reportingMTA"`
@@ -36,7 +37,7 @@ type Delivery struct {
 }
 
 type Bounce struct {
-	ID            uint   `json:"-" gorm:"primary_key"`
+	ID            uint   `json:"-"`
 	BounceSubType string `json:"bounceSubType"`
 	BounceType    string `json:"bounceType"`
 	FeedbackID    string `json:"feedbackId"`
@@ -45,7 +46,7 @@ type Bounce struct {
 }
 
 type Notification struct {
-	ID               uint   `json:"-" gorm:"primary_key"`
+	ID               uint   `json:"-"`
 	NotificationType string `json:"notificationType"`
 	Mail             Mail   `json:"mail"`
 	MailID           sql.NullInt64
@@ -53,4 +54,5 @@ type Notification struct {
 	BounceID         sql.NullInt64
 	Delivery         Delivery `json:"delivery"`
 	DeliveryID       sql.NullInt64
+	CreatedAt        time.Time
 }
