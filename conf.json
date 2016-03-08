@@ -1,0 +1,8 @@
+{
+	"Adapter" : "postgres",
+	"User" : "postgres",
+	"Database" : "notifications",
+	"Password" : "password",
+	"Host" : "localhost",
+	"Port" : "5433"
+}
