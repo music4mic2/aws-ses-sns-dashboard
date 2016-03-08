@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 )
@@ -16,7 +17,7 @@ func (l *StringArray) Scan(input interface{}) error {
 }
 
 type Mail struct {
-	ID               uint        `gjson:"-" gorm:"primary_key"`
+	ID               uint        `json:"-" gorm:"primary_key"`
 	Destination      StringArray `json:"destination" sql:"type:text"`
 	MessageID        string      `json:"messageId"`
 	SendingAccountID string      `json:"sendingAccountId"`
@@ -26,6 +27,7 @@ type Mail struct {
 }
 
 type Delivery struct {
+	ID                   uint        `json:"-" gorm:"primary_key"`
 	ProcessingTimeMillis int         `json:"processingTimeMillis"`
 	Recipients           StringArray `json:"recipients" sql:"type:text"`
 	ReportingMTA         string      `json:"reportingMTA"`
@@ -34,31 +36,21 @@ type Delivery struct {
 }
 
 type Bounce struct {
-	BounceSubType     string `json:"bounceSubType"`
-	BounceType        string `json:"bounceType"`
-	BouncedRecipients []struct {
-		Action         string `json:"action"`
-		DiagnosticCode string `json:"diagnosticCode"`
-		EmailAddress   string `json:"emailAddress"`
-		Status         string `json:"status"`
-	} `json:"bouncedRecipients"`
-	FeedbackID   string `json:"feedbackId"`
-	ReportingMTA string `json:"reportingMTA"`
-	Timestamp    string `json:"timestamp"`
+	ID            uint   `json:"-" gorm:"primary_key"`
+	BounceSubType string `json:"bounceSubType"`
+	BounceType    string `json:"bounceType"`
+	FeedbackID    string `json:"feedbackId"`
+	ReportingMTA  string `json:"reportingMTA"`
+	Timestamp     string `json:"timestamp"`
 }
 
-//TODO polimorfic association
-
-type BounceType struct {
-	ID               uint   `gjson:"-" gorm:"primary_key"`
+type Notification struct {
+	ID               uint   `json:"-" gorm:"primary_key"`
 	NotificationType string `json:"notificationType"`
 	Mail             Mail   `json:"mail"`
+	MailID           sql.NullInt64
 	Bounce           Bounce `json:"bounce"`
-}
-
-type DeliveryType struct {
-	ID               uint     `gjson:"-" gorm:"primary_key"`
-	NotificationType string   `json:"notificationType"`
-	Mail             Mail     `json:"mail"`
+	BounceID         sql.NullInt64
 	Delivery         Delivery `json:"delivery"`
+	DeliveryID       sql.NullInt64
 }
