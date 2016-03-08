@@ -5,16 +5,15 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
 
-func Bounces(res http.ResponseWriter, req *http.Request) {
+func Notifications(res http.ResponseWriter, req *http.Request) {
+
+	var notification Notification
 
 	decoder := json.NewDecoder(req.Body)
-	var bounceType BounceType
-	err := decoder.Decode(&bounceType)
-	if err != nil {
+	if err := decoder.Decode(&notification); err != nil {
 		log.Fatal(err)
 	}
 
@@ -26,19 +25,8 @@ func Bounces(res http.ResponseWriter, req *http.Request) {
 	}
 
 	db.DB()
-	log.Println(db.DB().Ping())
-	db.CreateTable(&bounceType)
-	db.Create(&bounceType)
-}
+	db.LogMode(true)
 
-func Complaints(w http.ResponseWriter, r *http.Request) {
-}
-
-func Deliveries(res http.ResponseWriter, req *http.Request) {
-}
-
-func connectDB() (gorm.DB, error) {
-	db, error := gorm.Open("postgres", "user=postgres dbname=notifications password=password host=localhost port=5433 sslmode=disable")
-	log.Println(db.DB().Ping())
-	return db, error
+	log.Println(notification)
+	db.Create(&notification)
 }
