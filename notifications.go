@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 	"time"
@@ -49,10 +48,10 @@ type Notification struct {
 	ID               uint   `json:"-"`
 	NotificationType string `json:"notificationType"`
 	Mail             Mail   `json:"mail"`
-	MailID           sql.NullInt64
+	MailID           int
 	Bounce           Bounce `json:"bounce"`
-	BounceID         sql.NullInt64
+	BounceID         int
 	Delivery         Delivery `json:"delivery"`
-	DeliveryID       sql.NullInt64
+	DeliveryID       int
 	CreatedAt        time.Time
 }
