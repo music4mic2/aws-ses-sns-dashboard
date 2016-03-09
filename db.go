@@ -78,7 +78,5 @@ func setForeignKeys() {
 	}
 
 	db.DB()
-
-	db.Model(&Notification{}).AddForeignKey("delivery_id", "deliveries(id)", "RESTRICT", "RESTRICT")
-	db.Model(&Notification{}).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
+	db.Model(&notification).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
 }
