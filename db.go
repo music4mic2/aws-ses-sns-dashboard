@@ -23,28 +23,26 @@ type Configuration struct {
 	Port     string
 }
 
-func connectDB() (gorm.DB, error) {
+func connectDB() gorm.DB {
 
 	var configuration Configuration
 	file, _ := os.Open("conf.json")
 	decoder := json.NewDecoder(file)
 
 	if err := decoder.Decode(&configuration); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 
 	db, error := gorm.Open(configuration.Adapter, "user="+configuration.User+" dbname="+configuration.Database+" password="+configuration.Password+" host="+configuration.Host+" port="+configuration.Port+" sslmode=disable")
-	return db, error
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	return db
 }
 
 func createTables() {
-	db, err := connectDB()
-
-	if err != nil {
-		log.Fatal(err)
-		log.Fatal("failed connect DB")
-	}
-
+	db := connectDB()
 	db.DB()
 
 	db.CreateTable(&mail)
@@ -54,13 +52,7 @@ func createTables() {
 }
 
 func deleteTables() {
-	db, err := connectDB()
-
-	if err != nil {
-		log.Fatal(err)
-		log.Fatal("failed connect DB")
-	}
-
+	db := connectDB()
 	db.DB()
 
 	db.DropTable(&notification)
@@ -70,13 +62,8 @@ func deleteTables() {
 }
 
 func setForeignKeys() {
-	db, err := connectDB()
-
-	if err != nil {
-		log.Fatal(err)
-		log.Fatal("failed connect DB")
-	}
-
+	db := connectDB()
 	db.DB()
+
 	db.Model(&notification).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
 }

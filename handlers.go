@@ -17,16 +17,8 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 		log.Println(err)
 	}
 
-	db, err := connectDB()
-
-	if err != nil {
-		log.Fatal(err)
-		log.Fatal("failed connect DB")
-	}
-
+	db := connectDB()
 	db.DB()
 	db.LogMode(true)
-
-	log.Println(notification)
 	db.Create(&notification)
 }
