@@ -14,7 +14,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&notification); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	db, err := connectDB()
