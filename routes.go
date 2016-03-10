@@ -35,4 +35,10 @@ var routes = Routes{
 		"POST",
 		Notifications,
 	},
+	Route{
+		"Notifications",
+		"/notifications",
+		"GET",
+		NotificationIndex,
+	},
 }
