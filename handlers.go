@@ -24,13 +24,15 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 }
 
 func NotificationIndex(res http.ResponseWriter, req *http.Request) {
-	var notification Notification
+
+	var notifications []Notification
+
 	db := connectDB()
 	db.DB()
 	db.LogMode(true)
-	db.Preload("Mail").Find(&notification)
+	db.Preload("Mail").Find(&notifications)
 
-	json, err := json.Marshal(notification)
+	json, err := json.Marshal(notifications)
 	if err != nil {
 		log.Println(err)
 		return
