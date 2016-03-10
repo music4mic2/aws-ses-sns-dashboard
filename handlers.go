@@ -22,3 +22,19 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 	db.LogMode(true)
 	db.Create(&notification)
 }
+
+func NotificationIndex(res http.ResponseWriter, req *http.Request) {
+	var notification Notification
+	db := connectDB()
+	db.DB()
+	db.LogMode(true)
+	db.Preload("Mail").Find(&notification)
+
+	json, err := json.Marshal(notification)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	res.Header().Set("Content-Type", "application/json")
+	res.Write(json)
+}
