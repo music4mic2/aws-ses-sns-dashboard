@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -38,5 +39,22 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*");
 	res.Write(json)
+}
+
+func Stylesheets() {
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
+}
+
+//html views
+func Dashboard(res http.ResponseWriter, req *http.Request) {
+	var notification Notification
+	db := connectDB()
+	db.DB()
+
+	tmpl, _ := template.ParseFiles("views/dashboard.html")
+	tmpl.Execute(res, notification)
+
+	res.Header().Set("Content-Type", "text/html")
 }
