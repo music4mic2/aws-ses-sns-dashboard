@@ -24,6 +24,12 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 }
 
 func NotificationIndex(res http.ResponseWriter, req *http.Request) {
+	if !check(res, req) {
+		res.Header().Set("WWW-Authenticate", `Basic realm="MY REALM"`)
+		res.WriteHeader(401)
+		res.Write([]byte("401 Unauthorized\n"))
+		return
+	}
 
 	var notifications []Notification
 
