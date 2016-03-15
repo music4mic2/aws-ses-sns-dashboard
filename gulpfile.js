@@ -34,7 +34,7 @@ gulp.task('css:min', function() {
 gulp.task('js:min', function() {
   return browserify({entries: './app/js/notification.js', standalone: 'Notification',  extensions: [ '.jsx', '.js' ]})
   .external(["react", "react-dom"])
-  .transform('babelify', {presets: ['es2015', 'react']})
+  .transform('babelify', {presets: ['react']})
   .transform(globalShim)
   .bundle()
   .pipe(source('notification.js'))
