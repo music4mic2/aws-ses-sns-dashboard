@@ -4,8 +4,9 @@ var NotificationComponent = React.createClass({
   },
   componentDidMount: function() {
   var _this = this;
+
   //TODO
-  $.get( "http://localhost:8000/notifications", function(data){})
+  $.get( "http://localhost:8000/notifications", { page: 1, limit: 2 }, function(data){})
     .done(function(data) {
       _this.setState( { list: data })
     });
@@ -13,13 +14,13 @@ var NotificationComponent = React.createClass({
   render: function() {
     if ( this.state.list.length > 0 ) {
       var notifications = this.state.list.map(function(value, index){
+        var date = new Date(value.CreatedAt);
         return (
           <tr key={index}>
-            <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}</td>
+            <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}<br /><small className="text-muted">{ date.toUTCString() }</small></td>
             <td>{ value.mail.destination.join(", ") }</td>
             <td>{ value.mail.source }</td>
-            <td>{ value.CreatedAt }</td>
-            <td></td>
+            <td>{ value.bounce.bounceSubType || "" }</td>
           </tr>
         )
       });
@@ -29,8 +30,8 @@ var NotificationComponent = React.createClass({
           <tr>
             <th>Notificación</th>
             <th>Email</th>
-            <th>Descripción</th>
-            <th>Fecha</th>
+            <th>Fuente</th>
+            <th>Detalle</th>
           </tr>
           </thead>
           <tbody>
