@@ -12,11 +12,10 @@ var NotificationComponent = React.createClass({
   },
   render: function() {
     if ( this.state.list.length > 0 ) {
-      var notifications = this.state.list.map(function(value){
-        console.log(value.mail);
+      var notifications = this.state.list.map(function(value, index){
         return (
-          <tr>
-            <td>{ value.notificationType }</td>
+          <tr key={index}>
+            <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}</td>
             <td>{ value.mail.destination.join(", ") }</td>
             <td>{ value.mail.source }</td>
             <td>{ value.CreatedAt }</td>
@@ -24,10 +23,24 @@ var NotificationComponent = React.createClass({
           </tr>
         )
       });
-    return (<tbody>{ notifications }</tbody>);
+    return (
+        <table className="table table-striped">
+          <thead>
+          <tr>
+            <th>Notificación</th>
+            <th>Email</th>
+            <th>Descripción</th>
+            <th>Fecha</th>
+          </tr>
+          </thead>
+          <tbody>
+            { notifications }
+          </tbody>
+        </table>
+        );
   }
   else {
-    return (<tbody><tr><td colSpan='4'></td></tr></tbody>)
+    return (<span></span>)
     }
   },
 });
