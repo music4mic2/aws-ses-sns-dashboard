@@ -26,7 +26,7 @@ gulp.task('css:min', function() {
   return gulp.src('./app/css/*.css')
   .pipe(concat('style.min.css'))
   .pipe(cssmin())
-  .pipe(gulp.dest('./assets/css'));
+  .pipe(gulp.dest('./app/assets/css'));
 })
 
 /** JavaScript compilation */
@@ -40,7 +40,7 @@ gulp.task('js:min', function() {
   .pipe(source('notification.js'))
   .pipe(buffer())
   .pipe(uglify())
-  .pipe(gulp.dest('./assets/js'));
+  .pipe(gulp.dest('./app/assets/js'));
 })
 
 /**
