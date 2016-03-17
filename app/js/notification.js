@@ -54,14 +54,22 @@ var NotificationComponent = React.createClass({
     var page = page || 1;
     var email = email || "";
 
-    //TODO
-    $.get( "http://localhost:8000/notifications", { page: page, email: email }, function(data){})
-    .done(function(data) {
-      _this.setState({ 
-        list: data, 
-        page: page, 
-        email: email 
-      });
+    $.ajax({
+      method: "GET",
+      url: "http://localhost:8000/notifications",
+      withCredentials: true,
+      data: { page: page, email: email },
+      success: function( data ) {
+        _this.setState({
+          list: data,
+          page: page,
+          email: email
+        });
+      },
+      beforeSend: function (xhr) {
+        xhr.withCredentials = true;
+        xhr.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
+      }
     });
   },
   componentDidMount: function() {
