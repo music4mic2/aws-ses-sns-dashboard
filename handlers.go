@@ -14,7 +14,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 	var notification Notification
 
 	if !check(res, req) {
-		res.Header().Set("WWW-Authenticate", `Basic realm="MY REALM"`)
+		res.Header().Set("WWW-Authenticate", `Basic realm="beetrack.com"`)
 		res.WriteHeader(401)
 		res.Write([]byte("401 Unauthorized\n"))
 		return
@@ -46,7 +46,7 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, Accept")
 
 	if !check(res, req) {
-		res.Header().Set("WWW-Authenticate", `Basic realm="MY REALM"`)
+		res.Header().Set("WWW-Authenticate", `Basic realm="beetrack.com"`)
 		res.WriteHeader(401)
 		res.Write([]byte("401 Unauthorized\n"))
 		return
