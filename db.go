@@ -15,15 +15,6 @@ var delivery Delivery
 var notification Notification
 var db *gorm.DB
 
-type Configuration struct {
-	Adapter  string
-	User     string
-	Database string
-	Password string
-	Host     string
-	Port     string
-}
-
 func connectDB() *gorm.DB {
 
 	var configuration Configuration
@@ -34,7 +25,8 @@ func connectDB() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	db, error := gorm.Open(configuration.Adapter, "user="+configuration.User+" dbname="+configuration.Database+" password="+configuration.Password+" host="+configuration.Host+" port="+configuration.Port+" sslmode=disable")
+	var database Database = configuration.Database
+	db, error := gorm.Open(database.Adapter, "user="+database.User+" dbname="+database.Database+" password="+database.Password+" host="+database.Host+" port="+database.Port+" sslmode=disable")
 	if error != nil {
 		log.Fatal(error)
 	}
