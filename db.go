@@ -13,6 +13,7 @@ var mail Mail
 var bounce Bounce
 var delivery Delivery
 var notification Notification
+var db *gorm.DB
 
 type Configuration struct {
 	Adapter  string
@@ -23,7 +24,7 @@ type Configuration struct {
 	Port     string
 }
 
-func connectDB() gorm.DB {
+func connectDB() *gorm.DB {
 
 	var configuration Configuration
 	file, _ := os.Open("conf.json")
