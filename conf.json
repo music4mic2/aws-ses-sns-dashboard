@@ -8,7 +8,7 @@
 	"Port" : "5433"
   },
   "BasicAuth" : {
-	"User" : "Admin",
-	"Password" : "Admin"
+	"User" : "admin",
+	"Password" : "admin"
 	}
 }
