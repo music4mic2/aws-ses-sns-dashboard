@@ -32,19 +32,19 @@ func NewRouter() *mux.Router {
 var routes = Routes{
 	Route{
 		"Notifications",
-		"/notifications",
+		"/",
 		"POST",
 		Notifications,
 	},
 	Route{
 		"Notifications",
-		"/notifications",
+		"/dashboard",
 		"GET",
 		NotificationIndex,
 	},
 	Route{
 		"Notifications",
-		"/notifications",
+		"/dashboard",
 		"OPTIONS",
 		NotificationIndex,
 	},
