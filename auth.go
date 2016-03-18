@@ -2,11 +2,15 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
 func check(w http.ResponseWriter, r *http.Request) bool {
+
 	s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 	if len(s) != 2 {
 		return false
@@ -22,5 +26,16 @@ func check(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 
-	return pair[0] == "admin" && pair[1] == "admin"
+	var configuration Configuration
+
+	file, _ := os.Open("conf.json")
+	decoder := json.NewDecoder(file)
+
+	if err := decoder.Decode(&configuration); err != nil {
+		log.Fatal(err)
+	}
+
+	var basicAuth BasicAuth = configuration.BasicAuth
+
+	return pair[0] == basicAuth.User && pair[1] == basicAuth.Password
 }
