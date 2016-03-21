@@ -16,8 +16,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 		body, _ := ioutil.ReadAll(req.Body)
 
 		mapper := make(map[string]string)
-		e := json.Unmarshal(body, &mapper)
-		log.Println(e)
+		json.Unmarshal(body, &mapper)
 
 		var notification Notification
 
@@ -38,7 +37,7 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Credentials", "true")
 	res.Header().Set("Access-Control-Allow-Headers", "Authorization")
-	res.Header().Set("Access-Control-Allow-Origin", "http://localhost")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if req.Method == "GET" {
 
@@ -57,9 +56,9 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 			db.DB()
 			db.LogMode(true)
 
-			db.Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Preload("Mail").Preload("Bounce").Find(&notifications)
+			db.Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Preload("Mail").Preload("Bounce").Find(&notifications)
 			if email != "" {
-				db.Where("mails.destination LIKE ?", "%"+email+"%").Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Joins("JOIN mails on mails.id = notifications.mail_id").Preload("Mail").Preload("Bounce").Find(&notifications)
+				db.Where("mails.destination LIKE ?", "%"+email+"%").Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Joins("JOIN mails on mails.id = notifications.mail_id").Preload("Mail").Preload("Bounce").Find(&notifications)
 			}
 
 			json, err := json.Marshal(notifications)
@@ -82,10 +81,7 @@ func SubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
 		}
 
 		mapper := make(map[string]interface{})
-		e := json.Unmarshal(body, &mapper)
-
-		log.Println(e)
-		log.Println(mapper)
+		json.Unmarshal(body, &mapper)
 
 		switch req.Header.Get("x-amz-sns-message-type") {
 		case "SubscriptionConfirmation":
