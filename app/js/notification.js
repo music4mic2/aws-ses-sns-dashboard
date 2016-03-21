@@ -54,9 +54,11 @@ var NotificationComponent = React.createClass({
     var page = page || 1;
     var email = email || "";
 
+    var url = "http://localhost:8000/dashboard"
+
     $.ajax({
       method: "GET",
-      url: "http://localhost:8000/notifications",
+      url: url,
       withCredentials: true,
       data: { page: page, email: email },
       success: function( data ) {
@@ -67,7 +69,6 @@ var NotificationComponent = React.createClass({
         });
       },
       beforeSend: function (xhr) {
-        xhr.withCredentials = true;
         xhr.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
       }
     });
