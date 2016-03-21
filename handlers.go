@@ -13,6 +13,10 @@ import (
 func Notifications(res http.ResponseWriter, req *http.Request) {
 
 	var notification Notification
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&notification); err != nil {
+		log.Println(err)
+	}
 
 	if checkAuth(res, req) {
 
@@ -21,10 +25,14 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 			res.Write([]byte("200 OK\n"))
 			return
 		} else {
-			decoder := json.NewDecoder(req.Body)
-			if err := decoder.Decode(&notification); err != nil {
-				log.Println(err)
-			}
+
+			body, _ := ioutil.ReadAll(req.Body)
+
+			mapper := make(map[string]string)
+			json.Unmarshal(body, &mapper)
+
+			message := mapper["Message"]
+			json.Unmarshal([]byte(message), &notification)
 
 			db := connectDB()
 			db.DB()
@@ -38,42 +46,40 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 
 	const limit = 100
 
-	user, pass, _ := req.BasicAuth()
-	log.Println(user)
-	log.Println(pass)
-
 	res.Header().Set("Content-Type", "application/json")
-	res.Header().Set("Access-Control-Allow-Origin", "*")
-	res.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 	res.Header().Set("Access-Control-Allow-Credentials", "true")
-	res.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, Accept")
+	res.Header().Set("Access-Control-Allow-Headers", "Authorization")
+	res.Header().Set("Access-Control-Allow-Origin", "http://localhost")
 
-	if checkAuth(res, req) {
+	if req.Method == "GET" {
 
-		page, _ := strconv.Atoi(req.URL.Query().Get("page"))
-		email := req.URL.Query().Get("email")
+		if checkAuth(res, req) {
 
-		if page == 0 {
-			page++
+			page, _ := strconv.Atoi(req.URL.Query().Get("page"))
+			email := req.URL.Query().Get("email")
+
+			if page == 0 {
+				page++
+			}
+
+			var notifications []Notification
+
+			db := connectDB()
+			db.DB()
+			db.LogMode(true)
+
+			db.Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Preload("Mail").Preload("Bounce").Find(&notifications)
+			if email != "" {
+				db.Where("mails.destination LIKE ?", "%"+email+"%").Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Joins("JOIN mails on mails.id = notifications.mail_id").Preload("Mail").Preload("Bounce").Find(&notifications)
+			}
+
+			json, err := json.Marshal(notifications)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			res.Write(json)
 		}
-
-		var notifications []Notification
-
-		db := connectDB()
-		db.DB()
-		db.LogMode(true)
-
-		db.Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Preload("Mail").Preload("Bounce").Find(&notifications)
-		if email != "" {
-			db.Where("mails.destination LIKE ?", "%"+email+"%").Offset((page - 1) * limit).Limit(limit).Order("created_at asc").Joins("JOIN mails on mails.id = notifications.mail_id").Preload("Mail").Preload("Bounce").Find(&notifications)
-		}
-
-		json, err := json.Marshal(notifications)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		res.Write(json)
 	}
 }
 
@@ -89,6 +95,7 @@ func SubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
 		e := json.Unmarshal(body, &mapper)
 
 		log.Println(e)
+		log.Println(body)
 
 		switch req.Header.Get("x-amz-sns-message-type") {
 		case "SubscriptionConfirmation":
