@@ -12,33 +12,22 @@ import (
 
 func Notifications(res http.ResponseWriter, req *http.Request) {
 
-	var notification Notification
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&notification); err != nil {
-		log.Println(err)
-	}
-
 	if checkAuth(res, req) {
+		body, _ := ioutil.ReadAll(req.Body)
 
-		if SubscriptionConfirmation(res, req) {
-			res.WriteHeader(200)
-			res.Write([]byte("200 OK\n"))
-			return
-		} else {
+		mapper := make(map[string]string)
+		e := json.Unmarshal(body, &mapper)
+		log.Println(e)
 
-			body, _ := ioutil.ReadAll(req.Body)
+		var notification Notification
 
-			mapper := make(map[string]string)
-			json.Unmarshal(body, &mapper)
+		message := mapper["Message"]
+		json.Unmarshal([]byte(message), &notification)
 
-			message := mapper["Message"]
-			json.Unmarshal([]byte(message), &notification)
-
-			db := connectDB()
-			db.DB()
-			db.LogMode(true)
-			db.Create(&notification)
-		}
+		db := connectDB()
+		db.DB()
+		db.LogMode(true)
+		db.Create(&notification)
 	}
 }
 
@@ -91,11 +80,12 @@ func SubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
 		if err != nil {
 			log.Println(err)
 		}
+
 		mapper := make(map[string]interface{})
 		e := json.Unmarshal(body, &mapper)
 
 		log.Println(e)
-		log.Println(body)
+		log.Println(mapper)
 
 		switch req.Header.Get("x-amz-sns-message-type") {
 		case "SubscriptionConfirmation":
