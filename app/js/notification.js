@@ -83,11 +83,9 @@ var NotificationComponent = React.createClass({
         var date = new Date(value.CreatedAt);
         return (
           <tr key={index}>
-            <td>{value.MailID}</td>
-            <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}<br /><small className="text-muted">{ date.toUTCString() }</small></td>
+            <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}<br /><small className="text-muted">{ date.toLocaleString() }</small></td>
             <td>{ value.mail.destination.join(", ") }</td>
             <td>{ value.mail.source }</td>
-            <td>{ value.bounce.bounceSubType || "" }</td>
           </tr>
         )
       });
@@ -98,11 +96,9 @@ var NotificationComponent = React.createClass({
           <table className="table table-striped">
             <thead>
               <tr>
-                <th>id</th>
                 <th>Notificación</th>
                 <th>Email</th>
                 <th>Fuente</th>
-                <th>Detalle</th>
               </tr>
             </thead>
             <tbody>
