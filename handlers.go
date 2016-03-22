@@ -24,7 +24,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 		json.Unmarshal([]byte(message), &notification)
 
 		db := connectDB()
-		db.DB()
+		db.DB().SetMaxIdleConns(0)
 		db.LogMode(true)
 		db.Create(&notification)
 	}
@@ -53,7 +53,7 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 			var notifications []Notification
 
 			db := connectDB()
-			db.DB()
+			db.DB().SetMaxIdleConns(0)
 			db.LogMode(true)
 
 			db.Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Preload("Mail").Preload("Bounce").Find(&notifications)
