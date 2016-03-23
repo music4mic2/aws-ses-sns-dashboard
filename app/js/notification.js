@@ -36,8 +36,12 @@ var FilterComponent = React.createClass({
   },
    clickHandler: function(){
      var email = $("#email").val();
-     var page = this.props.page;
-     this.props.fetchList(page, email);
+     if (email != "") {
+       var page = this.props.page;
+       this.props.fetchList(page, email);
+     } else {
+       alert("El campo no puede estar vacio");
+     }
    }
 });
 
@@ -57,7 +61,7 @@ var NotificationComponent = React.createClass({
     var url = "http://localhost:8000/dashboard"
 
     $.ajax({
-      method: "GET",
+      method: "POST",
       url: url,
       withCredentials: true,
       data: { page: page, email: email },
