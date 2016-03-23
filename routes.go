@@ -39,7 +39,7 @@ var routes = Routes{
 	Route{
 		"Notifications",
 		"/dashboard",
-		"GET",
+		"POST",
 		NotificationIndex,
 	},
 	Route{

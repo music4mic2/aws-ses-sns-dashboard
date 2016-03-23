@@ -39,12 +39,12 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Headers", "Authorization")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if req.Method == "GET" {
+	if req.Method == "POST" {
 
 		if checkAuth(res, req) {
 
-			page, _ := strconv.Atoi(req.URL.Query().Get("page"))
-			email := req.URL.Query().Get("email")
+			page, _ := strconv.Atoi(req.FormValue("page"))
+			email := req.FormValue("email")
 
 			if page == 0 {
 				page++
