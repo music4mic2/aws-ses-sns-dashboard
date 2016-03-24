@@ -22,26 +22,31 @@ var FilterComponent = React.createClass({
   render: function() {
     return (
       <div className="row">
-        <div className="form-group">
-          <div className="col-sm-4">
-            <div className="input-group"><input type="email" placeholder="Email" className="input-sm form-control" id="email" required />
-              <span className="input-group-btn">
-                <button type="button" className="btn btn-sm btn-primary" onClick={this.clickHandler}>Buscar</button>
-              </span>
-            </div>
-          </div>
+        <div className="col-sm-4 m-b-xs">
+          <select name="type" id="type" className="input-sm form-control input-s-sm inline">
+            <option value="">Todos</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Bounce">Bounce</option>
+          </select>
+        </div>
+        <div className="col-sm-3 m-b-xs">
+          <input type="email" placeholder="Email" className="input-sm form-control" id="email"/>
+        </div>
+        <div className="col-sm-3 m-b-xs">
+          <input type="source" placeholder="Fuente" className="input-sm form-control" id="source"/>
+        </div>
+        <div className="col-sm-2 pull-right">
+         <button type="button" className="btn btn-sm btn-primary" onClick={this.clickHandler}>Buscar</button>
         </div>
       </div>
     )
   },
    clickHandler: function(){
      var email = $("#email").val();
-     if (email != "") {
-       var page = this.props.page;
-       this.props.fetchList(page, email);
-     } else {
-       alert("El campo no puede estar vacio");
-     }
+     var source = $("#source").val();
+     var type = $("#type").val();
+     var page = this.props.page;
+     this.props.fetchList(page, type, email, source);
    }
 });
 
@@ -50,13 +55,17 @@ var NotificationComponent = React.createClass({
     return { 
       list: {}, 
       page: 1, 
-      email: null
+      type: null, 
+      email: null,
+      source: null,
     };
   },
-  fetchList: function(page, email){
+  fetchList: function(page, type, email, source){
     var _this = this;
     var page = page || 1;
+    var type =  type || "";
     var email = email || "";
+    var source = source || "";
 
     var url = "http://localhost:8000/dashboard"
 
@@ -64,12 +73,14 @@ var NotificationComponent = React.createClass({
       method: "POST",
       url: url,
       withCredentials: true,
-      data: { page: page, email: email },
+      data: { page: page, type: type, email: email, source: source },
       success: function( data ) {
         _this.setState({
           list: data,
           page: page,
-          email: email
+          type: type,
+          email: email,
+          source: source
         });
       },
       beforeSend: function (xhr) {

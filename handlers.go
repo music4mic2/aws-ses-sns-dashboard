@@ -32,7 +32,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 
 func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 
-	const limit = 100
+	const limit = 22
 
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -44,6 +44,8 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 		if checkAuth(res, req) {
 
 			page, _ := strconv.Atoi(req.FormValue("page"))
+			nType := req.FormValue("type")
+			source := req.FormValue("source")
 			email := req.FormValue("email")
 
 			if page == 0 {
@@ -56,10 +58,21 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 			db.DB().SetMaxIdleConns(0)
 			db.LogMode(true)
 
-			db.Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Preload("Mail").Preload("Bounce").Find(&notifications)
+			chain := db.Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Preload("Mail").Joins("JOIN mails on mails.id = notifications.mail_id")
+
 			if email != "" {
-				db.Where("mails.destination LIKE ?", "%"+email+"%").Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Joins("JOIN mails on mails.id = notifications.mail_id").Preload("Mail").Preload("Bounce").Find(&notifications)
+				chain = chain.Where("mails.destination LIKE ?", "%"+email+"%")
 			}
+
+			if nType != "" {
+				chain = chain.Where("notifications.notification_type = ?", nType)
+			}
+
+			if source != "" {
+				chain = chain.Where("mails.source LIKE ?", "%"+source+"%")
+			}
+
+			chain.Find(&notifications)
 
 			json, err := json.Marshal(notifications)
 			if err != nil {
