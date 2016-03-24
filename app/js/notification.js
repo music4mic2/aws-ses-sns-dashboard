@@ -14,7 +14,9 @@ var PaginationComponent = React.createClass({
     $(".pagination").removeClass("active");
     $("li.pagination:eq("+ (page - 1) +")").addClass("active");
     var email = this.props.email;
-    this.props.fetchList(page, email);
+    var source = this.props.source;
+    var type = this.props.type;
+    this.props.fetchList(page, email, source, type);
   }
 });
 
@@ -120,14 +122,21 @@ var NotificationComponent = React.createClass({
               { notifications }
             </tbody>
           </table>
-          <PaginationComponent fetchList={this.fetchList} page={this.state.page} email={this.state.email}/>
+          <PaginationComponent fetchList={this.fetchList} page={this.state.page} email={this.state.email} type={this.state.type} source={this.state.source}/>
         </div>
       </div>
     );
   }
   else {
-    return (<div className="alert alert-info">No existen mas notificaciones.</div>)
+    return (
+        <div>
+          <FilterComponent fetchList={this.fetchList} page={1}/>
+          <br />
+          <div className="alert alert-info">No existen mas notificaciones.</div>
+        </div>
+      )
     }
   },
 });
+
 ReactDOM.render(<NotificationComponent/>, document.getElementById('content'));
