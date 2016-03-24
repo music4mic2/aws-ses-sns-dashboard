@@ -32,7 +32,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 
 func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 
-	const limit = 22
+	const limit = 100
 
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Credentials", "true")
