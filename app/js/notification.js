@@ -102,7 +102,7 @@ var NotificationComponent = React.createClass({
           <tr key={index}>
             <td>{value.notificationType == "Delivery" ? <span className="label label-primary">{value.notificationType}</span> : <span className="label label-danger">{value.notificationType}</span>}<br /><small className="text-muted">{ date.toLocaleString() }</small></td>
             <td>{ value.mail.destination.join(", ") }</td>
-            <td><a href={'https://s3.amazonaws.com/beetrack-shared/emails/' +  value.mail.messageId + "@email.amazonses.com.html"} sorce target="_blank"><i class="fa fa-search" aria-hidden="true"></i></a></td>
+            <td><a href={'https://s3.amazonaws.com/beetrack-shared/emails/' +  value.mail.messageId + "@email.amazonses.com.html"} sorce target="_blank">Vista</a></td>
             <td>{ value.mail.source }</td>
           </tr>
         )
@@ -116,8 +116,8 @@ var NotificationComponent = React.createClass({
               <tr>
                 <th>Notificación</th>
                 <th>Email</th>
-                <th>Fuente</th>
                 <th>Contenido</th>
+                <th>Fuente</th>
               </tr>
             </thead>
             <tbody>
