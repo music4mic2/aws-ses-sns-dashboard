@@ -59,4 +59,7 @@ func setForeignKeys() {
 	db.DB()
 
 	db.Model(&notification).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
+	db.Model(&mail).AddIndex("index_notification_type", "notification_type")
+	db.Model(&mail).AddIndex("index_mail_destination", "destination")
+	db.Model(&mail).AddIndex("index_mail_source", "source")
 }
