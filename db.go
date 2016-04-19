@@ -62,6 +62,9 @@ func setForeignKeys() {
 }
 
 func setIndex() {
+	db := connectDB()
+	db.DB()
+
 	db.Model(&notification).AddIndex("index_notification_type", "notification_type")
 	db.Model(&mail).AddIndex("index_mail_destination", "destination")
 	db.Model(&mail).AddIndex("index_mail_source", "source")
