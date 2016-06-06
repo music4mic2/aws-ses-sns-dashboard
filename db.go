@@ -3,9 +3,6 @@ package main
 import (
 	"log"
 
-	"encoding/json"
-	"os"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,28 +12,28 @@ var delivery Delivery
 var notification Notification
 var db *gorm.DB
 
+func dbInstance() *gorm.DB {
+	db := connectDB()
+	db.DB().SetMaxIdleConns(0)
+	db.LogMode(true)
+
+	return db
+}
+
 func connectDB() *gorm.DB {
-
-	var configuration Configuration
-	file, _ := os.Open("conf.json")
-	decoder := json.NewDecoder(file)
-
-	if err := decoder.Decode(&configuration); err != nil {
-		log.Fatal(err)
-	}
+	configuration := ReadConfiguration()
 
 	var database Database = configuration.Database
-	db, error := gorm.Open(database.Adapter, "user="+database.User+" dbname="+database.Database+" password="+database.Password+" host="+database.Host+" port="+database.Port+" sslmode=disable")
-	if error != nil {
-		log.Fatal(error)
+	db, err := gorm.Open(database.Adapter, "user="+database.User+" dbname="+database.Database+" password="+database.Password+" host="+database.Host+" port="+database.Port+" sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return db
 }
 
 func createTables() {
-	db := connectDB()
-	db.DB()
+	db := dbInstance()
 
 	db.CreateTable(&mail)
 	db.CreateTable(&bounce)
@@ -45,8 +42,7 @@ func createTables() {
 }
 
 func deleteTables() {
-	db := connectDB()
-	db.DB()
+	db := dbInstance()
 
 	db.DropTable(&notification)
 	db.DropTable(&mail)
@@ -55,15 +51,13 @@ func deleteTables() {
 }
 
 func setForeignKeys() {
-	db := connectDB()
-	db.DB()
+	db := dbInstance()
 
 	db.Model(&notification).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
 }
 
 func setIndex() {
-	db := connectDB()
-	db.DB()
+	db := dbInstance()
 
 	db.Model(&notification).AddIndex("index_notification_type", "notification_type")
 	db.Model(&mail).AddIndex("index_mail_destination", "destination")
