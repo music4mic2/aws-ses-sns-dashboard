@@ -32,33 +32,32 @@ func connectDB() *gorm.DB {
 	return db
 }
 
-func createTables() {
+func initialize() {
 	db := dbInstance()
+	createTables(db)
+	setForeignKeys(db)
+	setIndexes(db)
+}
 
+func createTables(db *gorm.DB) {
 	db.CreateTable(&mail)
 	db.CreateTable(&bounce)
 	db.CreateTable(&delivery)
 	db.CreateTable(&notification)
 }
 
-func deleteTables() {
-	db := dbInstance()
-
+func deleteTables(db *gorm.DB) {
 	db.DropTable(&notification)
 	db.DropTable(&mail)
 	db.DropTable(&bounce)
 	db.DropTable(&delivery)
 }
 
-func setForeignKeys() {
-	db := dbInstance()
-
+func setForeignKeys(db *gorm.DB) {
 	db.Model(&notification).AddForeignKey("mail_id", "mails(id)", "RESTRICT", "RESTRICT")
 }
 
-func setIndex() {
-	db := dbInstance()
-
+func setIndexes(db *gorm.DB) {
 	db.Model(&notification).AddIndex("index_notification_type", "notification_type")
 	db.Model(&mail).AddIndex("index_mail_destination", "destination")
 	db.Model(&mail).AddIndex("index_mail_source", "source")
