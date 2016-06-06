@@ -11,8 +11,7 @@ import (
 )
 
 func Notifications(res http.ResponseWriter, req *http.Request) {
-
-	if checkAuth(res, req) {
+	if checkAuth(res, req) && !isSubscriptionConfirmation(res, req) {
 		body, _ := ioutil.ReadAll(req.Body)
 
 		mapper := make(map[string]string)
@@ -80,7 +79,7 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func SubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
+func isSubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
 	if req.Header.Get("x-amz-sns-message-type") == "" {
 		return false
 	}
