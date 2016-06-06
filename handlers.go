@@ -23,9 +23,7 @@ func Notifications(res http.ResponseWriter, req *http.Request) {
 		message := mapper["Message"]
 		json.Unmarshal([]byte(message), &notification)
 
-		db := connectDB()
-		db.DB().SetMaxIdleConns(0)
-		db.LogMode(true)
+		db := dbInstance()
 		db.Create(&notification)
 	}
 }
@@ -54,9 +52,7 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 
 			var notifications []Notification
 
-			db := connectDB()
-			db.DB().SetMaxIdleConns(0)
-			db.LogMode(true)
+			db := dbInstance()
 
 			chain := db.Offset((page - 1) * limit).Limit(limit).Order("created_at desc").Preload("Mail").Joins("JOIN mails on mails.id = notifications.mail_id")
 
@@ -85,29 +81,33 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 }
 
 func SubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
-
-	if req.Header.Get("x-amz-sns-message-type") != "" {
-		body, err := ioutil.ReadAll(req.Body)
-
-		if err != nil {
-			log.Println(err)
-		}
-
-		mapper := make(map[string]interface{})
-		json.Unmarshal(body, &mapper)
-
-		switch req.Header.Get("x-amz-sns-message-type") {
-		case "SubscriptionConfirmation":
-			log.Println(mapper["SubscribeURL"])
-			return true
-		case "Notification":
-			log.Println(mapper["UnsubscribeURL"])
-
-		}
-		return true
-	} else {
+	if req.Header.Get("x-amz-sns-message-type") == "" {
 		return false
 	}
+	decoder := json.NewDecoder(req.Body)
+
+	mapper := make(map[string]interface{})
+	err := decoder.Decode(&mapper)
+
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	switch req.Header.Get("x-amz-sns-message-type") {
+	case "SubscriptionConfirmation":
+		log.Println(mapper["SubscribeURL"])
+		visitURL(mapper["SubscribeURL"].(string))
+	case "Notification":
+		log.Println(mapper["UnsubscribeURL"])
+	}
+	return true
+}
+
+func visitURL(url string) {
+	go func() {
+		http.Get(url)
+	}()
 }
 
 func checkAuth(res http.ResponseWriter, req *http.Request) bool {
