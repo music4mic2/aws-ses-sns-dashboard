@@ -5,12 +5,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"strconv"
 
 	_ "github.com/lib/pq"
 )
 
 func Notifications(res http.ResponseWriter, req *http.Request) {
+	logRequest(req)
 	if checkAuth(res, req) && !isSubscriptionConfirmation(res, req) {
 		body, _ := ioutil.ReadAll(req.Body)
 
@@ -118,4 +120,13 @@ func checkAuth(res http.ResponseWriter, req *http.Request) bool {
 	} else {
 		return true
 	}
+}
+
+func logRequest(req *http.Request) {
+	dump, err := httputil.DumpRequest(req, true)
+	if err != nil {
+		return
+	}
+
+	log.Printf("%s", dump)
 }
