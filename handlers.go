@@ -95,14 +95,16 @@ func isSubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool
 		return false
 	}
 
+	result := false
 	switch req.Header.Get("x-amz-sns-message-type") {
 	case "SubscriptionConfirmation":
 		log.Println(mapper["SubscribeURL"])
 		visitURL(mapper["SubscribeURL"].(string))
+		result = true
 	case "Notification":
 		log.Println(mapper["UnsubscribeURL"])
 	}
-	return true
+	return result
 }
 
 func visitURL(url string) {
