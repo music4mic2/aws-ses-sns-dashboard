@@ -7,17 +7,21 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/jinzhu/gorm"
 )
 
 var (
 	server           *httptest.Server
 	reader           io.Reader
 	notificationsUrl string
+	DB               *gorm.DB
 )
 
 func init() {
 	server = httptest.NewServer(NewRouter())
 	notificationsUrl = fmt.Sprintf("%s/", server.URL)
+	DB = dbInstance()
 }
 
 func TestProcessSubscription(t *testing.T) {
@@ -51,5 +55,44 @@ func TestProcessSubscription(t *testing.T) {
 
 	if res.StatusCode != http.StatusOK {
 		t.Errorf("Success expected: %d", res.StatusCode)
+	}
+}
+
+func TestProcessDelivery(t *testing.T) {
+	payloadJson := `{
+	  "Type" : "Notification",
+	  "MessageId" : "401349d2-854c-5217-b33c-0603cfd0333f",
+	  "TopicArn" : "arn:aws:sns:us-west-2:821745794127:bee-deliveries",
+	  "Message" : "{\"notificationType\":\"Delivery\",\"mail\":{\"timestamp\":\"2016-06-07T22:19:06.766Z\",\"source\":\"Ripley <noreply@beetrack.com>\",\"sourceArn\":\"arn:aws:ses:us-west-2:821745794127:identity/noreply@beetrack.com\",\"sendingAccountId\":\"821745794127\",\"messageId\":\"010101552cf2a28e-756b2cba-c111-43f6-b6cc-2c072ba9fb74-000000\",\"destination\":[\"beetrackripley@gmail.com\"]},\"delivery\":{\"timestamp\":\"2016-06-07T22:19:08.819Z\",\"processingTimeMillis\":2053,\"recipients\":[\"beetrackripley@gmail.com\"],\"smtpResponse\":\"250 2.0.0 OK 1465337948 fn4si2459578pac.157 - gsmtp\",\"reportingMTA\":\"a27-42.smtp-out.us-west-2.amazonses.com\"}}",
+	  "Timestamp" : "2016-06-07T22:19:08.907Z",
+	  "SignatureVersion" : "1",
+	  "Signature" : "dq+oi7Agqxb2VEFo/sMUoyFA8yTZ32RrgMn+satcluHqh61hABF2JW5T9vzxzQT8mGHD6rBNXBCeFbeeXvyvVEqxYPmT5GqxZr+M4geZmtJ3+6+yt8S12S6dWHi88kIjlB18xU3I0jKLR6vi4ZgjNcJQZKSdGYzsx5h08DxVqRcW6tnRlETOlcdjH6td0rIjRvYt9VVnAfQQcTiOqFajADueF/jo274FQRakY+nc8rzbrQ/MtChUgi9csPLwPgkZoDDjVNmC2DDdNcvS60c2h6TQnyT4m32fyXKNAYH7d8P1DPkJfMIzOIj0W7DSPTzF+3/G7oTIYEvIzpepjiSNBA==",
+	  "SigningCertURL" : "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-bb750dd426d95ee9390147a5624348ee.pem",
+	  "UnsubscribeURL" : "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:821745794127:bee-deliveries:061dc405-c38f-4605-94b4-68829cf6a9cb"
+	}`
+
+	reader = strings.NewReader(payloadJson)
+
+	request, err := http.NewRequest("POST", notificationsUrl, reader)
+
+	configuration := ReadConfiguration()
+	auth := configuration.BasicAuth
+	request.SetBasicAuth(auth.User, auth.Password)
+
+	var oldCount, newCount int
+	DB.Table("mails").Count(&oldCount)
+	res, err := http.DefaultClient.Do(request)
+	DB.Table("mails").Count(&newCount)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("Success expected: %d", res.StatusCode)
+	}
+
+	if oldCount == newCount {
+		t.Errorf("Mail count increment expected: %d", newCount+1)
 	}
 }
