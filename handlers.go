@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -13,15 +12,14 @@ import (
 
 func Notifications(res http.ResponseWriter, req *http.Request) {
 	logRequest(req)
-	if checkAuth(res, req) && !isSubscriptionConfirmation(res, req) {
-		body, _ := ioutil.ReadAll(req.Body)
-
-		mapper := make(map[string]string)
-		json.Unmarshal(body, &mapper)
-
+	if !checkAuth(res, req) {
+		return
+	}
+	jsonBody, err := jsonBody(req)
+	if err == nil && !isSubscriptionConfirmation(req, jsonBody) {
 		var notification Notification
 
-		message := mapper["Message"]
+		message := jsonBody["Message"].(string)
 		json.Unmarshal([]byte(message), &notification)
 
 		db := dbInstance()
@@ -81,28 +79,19 @@ func NotificationIndex(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func isSubscriptionConfirmation(res http.ResponseWriter, req *http.Request) bool {
+func isSubscriptionConfirmation(req *http.Request, jsonBody map[string]interface{}) bool {
 	if req.Header.Get("x-amz-sns-message-type") == "" {
-		return false
-	}
-	decoder := json.NewDecoder(req.Body)
-
-	mapper := make(map[string]interface{})
-	err := decoder.Decode(&mapper)
-
-	if err != nil {
-		log.Println(err)
 		return false
 	}
 
 	result := false
 	switch req.Header.Get("x-amz-sns-message-type") {
 	case "SubscriptionConfirmation":
-		log.Println(mapper["SubscribeURL"])
-		visitURL(mapper["SubscribeURL"].(string))
+		log.Println(jsonBody["SubscribeURL"])
+		visitURL(jsonBody["SubscribeURL"].(string))
 		result = true
 	case "Notification":
-		log.Println(mapper["UnsubscribeURL"])
+		log.Println(jsonBody["UnsubscribeURL"])
 	}
 	return result
 }
@@ -131,4 +120,16 @@ func logRequest(req *http.Request) {
 	}
 
 	log.Printf("%s", dump)
+}
+
+func jsonBody(req *http.Request) (map[string]interface{}, error) {
+	decoder := json.NewDecoder(req.Body)
+
+	mapper := make(map[string]interface{})
+	err := decoder.Decode(&mapper)
+
+	if err != nil {
+		log.Println(err)
+	}
+	return mapper, err
 }
