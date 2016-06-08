@@ -1,4 +1,4 @@
-Dashboard SES and SNS notifications
+Dashboard for SES/SNS notifications
 ===================
 
 Simple app to receive notifications from Amazon SES through Amazon SNS and save into database(PostgreSQL). Includes dashboard to see list of all notifications.
@@ -10,12 +10,12 @@ Simple app to receive notifications from Amazon SES through Amazon SNS and save 
  - Npm 2.14.2
  - Gulp 3.9.1
 
-  
+
 ### Build App ###
      go build
-     
+
 ### Execute App ###
-    ./aws-ses-sns-dasboard
-    
+    ./aws-ses-sns-dashboard
+
 ### Background processes ###
-     nohup ./aws-ses-sns-dasboard &
+     nohup ./aws-ses-sns-dashboard &
