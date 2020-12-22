@@ -19,3 +19,4 @@ Simple app to receive notifications from Amazon SES through Amazon SNS and save 
 
 ### Background processes ###
      nohup ./aws-ses-sns-dashboard &
+     npm install
