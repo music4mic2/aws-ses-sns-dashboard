@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "An image lightbox component for ReactJS",
   "author": "Carlos Andres Colonia",
+  "build": "node --max_old_space_size=8192 <entry_file_path> --progress --env.<dev/prod>",
   "keywords": [
     "react-component",
     "react",
@@ -28,7 +29,7 @@
     "react-dom": "^0.14.7"
 
   },
-  {"build": "node --max_old_space_size=8192 <entry_file_path> --progress --env.<dev/prod>"
+  
   
 }
   
